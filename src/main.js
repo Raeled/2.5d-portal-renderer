@@ -7,6 +7,20 @@ var ctx2 = canvas2.getContext("2d");
 function mainLoop() {
     updatePlayer();
 
+    for (var sectorId = 0; sectorId < sectors.length; sectorId++) {
+        var sector = sectors[sectorId];
+        if (sector.active) {
+
+            if (sector.target > sector.bottom) { sector.bottom += 1; }
+            else if (sector.target < sector.bottom) { sector.bottom -= 1; }
+            else { sector.active = false; }
+
+            if (player.sector == sectorId) {
+                player.z = sector.bottom + 20;
+            }
+        }
+    }
+
     var viewMatrix = mat4MulMat4(mat4Rotation(rads(-player.angle)),
                                  mat4Translation({x: -player.x, y: -player.y, z: 0}));
 
@@ -36,6 +50,23 @@ document.addEventListener('keydown', function(event) {
     switch (event.keyCode) {
         case 83 /* s */: saveMap(); break;
         case 76 /* l */: loadMap(); break;
+        case 32 /* space */:
+            var sector = sectors[player.sector];
+
+            for (line = 0; line < sector.points.length; line++) {
+                var a = sector.points[line];
+
+                if (a.portal) {
+                    var otherSector = sectors[a.portal.sector];
+                    if (otherSector.bottom != sector.bottom) {
+                        sector.target = otherSector.bottom;
+                        sector.active = true;
+                        break;
+                    }
+                }
+            }
+
+            break;
     }
 });
 
