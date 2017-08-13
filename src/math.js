@@ -96,3 +96,18 @@ function linesIntersect(p0, p1, p2, p3) {
 
     return s >= 0 && s <= 1 && t >= 0 && t <= 1;
 }
+
+function inPolygon(p, polygon) {
+    var points = polygon;
+    var result = false;
+
+    for (var i = 0; i < polygon.length; i++) {
+        var a = polygon[i];
+        var b = polygon[(i+1) % polygon.length];
+
+        if(((b.y >= p.y ) != (a.y >= p.y)) && (p.x <= (a.x - b.x) * (p.y - b.y) / (a.y - b.y) + b.x))
+            result = !result;
+    }
+
+    return result;
+}
