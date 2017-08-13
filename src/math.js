@@ -97,6 +97,19 @@ function linesIntersect(p0, p1, p2, p3) {
     return s >= 0 && s <= 1 && t >= 0 && t <= 1;
 }
 
+function polygonArea(polygon) {
+    var result = 0.0;
+
+    for (var i = 0; i < polygon.length; i++) {
+        var a = polygon[i];
+        var b = polygon[(i+1) % polygon.length];
+
+        result += (a.x * b.y) - (b.x * a.y);
+    }
+
+    return result / 2;
+}
+
 function inPolygon(p, polygon) {
     var points = polygon;
     var result = false;

@@ -3,7 +3,7 @@ var drawingSector = [];
 var canvas = document.getElementById("canvas");
 var ctx = canvas.getContext("2d");
 
-var camera = { x:50, y: 0};
+var camera = { x:0, y: 0};
 var cursor = { x:0, y: 0};
 var snapToGrid = true;
 var gridSize = 10;
@@ -100,16 +100,71 @@ function drawPoint(point) {
     }
 
     if (closed) {
-        sectors.push({bottom: -20, top: 20, points: drawingSector});
+        var sector = {
+            bottom: -20,
+            top: 20,
+            floorColor: "#f00",
+            ceilingColor: "#0ff",
+            points: drawingSector};
+        var sectorId = sectors.length;
+        var firstPortal = true;
+
+        if (polygonArea(drawingSector) < 0)
+            sector.points.reverse();
+
+        for (var line = 0; line < sector.points.length; line++) {
+            var a = sector.points[line];
+            var b = sector.points[(line+1) % sector.points.length];
+
+            for (otherSectorId = 0; otherSectorId < sectors.length; otherSectorId++) {
+                var otherSector = sectors[otherSectorId];
+                for (var otherLine = 0; otherLine < otherSector.points.length; otherLine++) {
+                    var otherA = otherSector.points[otherLine];
+                    var otherB = otherSector.points[(otherLine+1) % otherSector.points.length];
+
+                    var matchAA = false;//a.x == otherA.x && a.y == otherA.y;
+                    var matchBB = false;//b.x == otherB.x && b.y == otherB.y;
+                    var matchAB = a.x == otherB.x && a.y == otherB.y;
+                    var matchBA = b.x == otherA.x && b.y == otherA.y;
+
+                    if ((matchAA && matchBB) || (matchAB && matchBA)) {
+                        a.portal = {sector: otherSectorId, line: otherLine};
+                        otherA.portal = {sector: sectorId, line: line };
+
+                        if (firstPortal) {
+                            sector.bottom = otherSector.bottom;
+                            sector.top = otherSector.top;
+                            sector.floorColor = otherSector.floorColor;
+                            sector.ceilingColor = otherSector.ceilingColor;
+                        }
+
+                        firstPortal = false;
+                    }
+                }
+            }
+        }
+
+        sectors.push(sector);
         drawingSector = [];
     } else
         drawingSector.push({x: point.x, y: point.y });
 }
 
-function deleteSector() {
-    if (selectedSector >= 0) {
-        sectors.splice(selectedSector, 1);
-        selectedSector = -1;
+function deleteSector(sectorId) {
+    if (sectorId >= 0 && sectorId < sectors.length) {
+        sectors.splice(sectorId, 1);
+
+        for (var otherSectorId = 0; otherSectorId < sectors.length; otherSectorId++) {
+            var sector = sectors[otherSectorId];
+            for (var line = 0; line<sector.points.length; line++) {
+                var a = sector.points[line];
+
+                if (a.portal) {
+                    if (a.portal.sector == selectedSector) { a.portal = null; }
+                    else if (a.portal.sector > selectedSector) { a.portal.sector -= 1; }
+                }
+            }
+        }
     }
 }
 
@@ -122,7 +177,6 @@ function activate3dMode(point) {
             player.y = point.y;
             player.z = sector.bottom + 20;
             player.sector = sectorId;
-            completeSectors();
             view3d = true;
             return;
         }
@@ -138,20 +192,36 @@ function toggleViewMode(point) {
     else { view3d = false; }
 }
 
+function loadMap() {
+    var name = prompt("Load map ...");
+    sectors = JSON.parse(localStorage["map_" + name]);
+}
+
+function saveMap() {
+    var name = prompt("Save map as ...");
+    localStorage["map_" + name] = JSON.stringify(sectors);
+}
+
 document.addEventListener('keydown', function(event) {
-    var relativeCursor = { x: cursor.x + camera.x, y: cursor.y + camera.y };
+    if (!view3d) {
+        var relativeCursor = { x: cursor.x + camera.x, y: cursor.y + camera.y };
 
-    switch (event.keyCode) {
-        case 32 /* space */: drawPoint(relativeCursor); break;
-        case 27 /* esc */: drawingSector = []; break;
-        case 85 /* u */: drawingSector.pop(); break;
-        case 9 /* tab */: toggleViewMode(relativeCursor); break;
-        case 88 /* x */: deleteSector(); break;
-        default: console.log(event.keyCode); return;
+        switch (event.keyCode) {
+            case 32 /* space */: drawPoint(relativeCursor); break;
+            case 27 /* esc */: drawingSector = []; break;
+            case 85 /* u */: drawingSector.pop(); break;
+            case 9 /* tab */: toggleViewMode(relativeCursor); break;
+            case 88 /* x */: deleteSector(selectedSector); selectedSector = -1; break;
+            case 83 /* s */: saveMap(); break;
+            case 76 /* l */: loadMap(); break;
+            default: console.log(event.keyCode); return;
+        }
+
+        event.preventDefault();
+        if (!view3d) drawEditor();
+    } else {
+        if (event.keyCode == 9) { view3d = false; drawEditor(); event.preventDefault(); }
     }
-
-    event.preventDefault();
-    if (!view3d) drawEditor();
 });
 
 canvas.addEventListener('click', function(event) {
@@ -212,7 +282,5 @@ function mainLoop() {
         drawSector3d(player.sector, -1, renderState, 0, ctx.canvas.width);
     }
 }
-
-console.log(localStorage);
 
 window.setInterval(mainLoop, 1000/30);

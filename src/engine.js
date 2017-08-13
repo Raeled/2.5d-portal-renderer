@@ -1,14 +1,28 @@
 var keyLeft = false; var keyRight = false; var keyUp = false; var keyDown = false; var shiftPressed = false; var mapShown = false;
 var player = {x: 0, y: 0, z: -20, angle: 0, sector: 0};
 var sectors = [
-    {bottom: -40, top: 80, floorColor: "#0f0", points: [{x:-100, y: -100}, {x:0, y: -140}, {x:100, y:-100}, {x:100, y:0}, {x:100, y:100}, {x:-100, y:100}]},
-    {bottom: -30, top: 40, points: [{x:0, y: -140}, {x: 100, y: -100}, {x: 100, y: -200}, {x: 0, y: -200}]},
-    {bottom: -20, top: 50, points: [{x:0, y: -200}, {x: 100, y: -200}, {x: 100, y: -220}, {x: 0, y: -220}]},
-    {bottom: -10, top: 60, points: [{x:0, y: -220}, {x: 100, y: -220}, {x: 100, y: -240}, {x: 0, y: -240}]},
-    {bottom:   0, top: 70, points: [{x:0, y: -240}, {x: 100, y: -240}, {x: 100, y: -260}, {x: 0, y: -260}]},
-    {bottom:  10, top: 80, floorColor: "#00f", points: [{x:0, y: -260}, {x: 100, y: -260}, {x: 100, y: -360}, {x: -200, y: -360}, {x:-200, y: -260}, {x:-100, y:-260}]},
-    {bottom:  10, top: 80, floorColor: "#00f", points: [{x:-200, y: -260}, {x:-100, y:-260}, {x:-100, y:-100}, {x:-100, y:100}, {x:-200, y:100}]}
+    {bottom: -40, top: 80, floorColor: "#0f0", ceilingColor: "#0ff", points: [{x:-100, y: -100}, {x:   0, y: -140}, {x: 100, y: -100}, {x: 100, y:    0}, {x: 100, y: 100}, {x:-100, y:100}]},
+    {bottom: -30, top: 80, floorColor: "#f00", ceilingColor: "#0ff", points: [{x:   0, y: -200}, {x: 100, y: -200}, {x: 100, y: -100}, {x:   0, y: -140}]},
+    {bottom: -20, top: 80, floorColor: "#f00", ceilingColor: "#0ff", points: [{x:   0, y: -220}, {x: 100, y: -220}, {x: 100, y: -200}, {x:   0, y: -200}]},
+    {bottom: -10, top: 80, floorColor: "#f00", ceilingColor: "#0ff", points: [{x:   0, y: -240}, {x: 100, y: -240}, {x: 100, y: -220}, {x:   0, y: -220}]},
+    {bottom:   0, top: 80, floorColor: "#f00", ceilingColor: "#0ff", points: [{x:   0, y: -260}, {x: 100, y: -260}, {x: 100, y: -240}, {x:   0, y: -240}]},
+    {bottom:  10, top: 80, floorColor: "#00f", ceilingColor: "#0ff", points: [{x:-100, y: -260}, {x:-200, y: -260}, {x:-200, y: -360}, {x: 100, y: -360}, {x: 100, y: -260}, {x:   0, y: -260}]},
+    {bottom:  10, top: 80, floorColor: "#00f", ceilingColor: "#0ff", points: [{x:-200, y: -260}, {x:-100, y: -260}, {x:-100, y: -100}, {x:-100, y:  100}, {x:-200, y:  100}]}
 ];
+sectors[0].points[1].portal = {sector:1, line:2};
+sectors[0].points[5].portal = {sector:6, line:2};
+sectors[1].points[0].portal = {sector:2, line:2};
+sectors[1].points[2].portal = {sector:0, line:1};
+sectors[2].points[0].portal = {sector:3, line:2};
+sectors[2].points[2].portal = {sector:1, line:0};
+sectors[3].points[0].portal = {sector:4, line:2};
+sectors[3].points[2].portal = {sector:2, line:0};
+sectors[4].points[0].portal = {sector:5, line:4};
+sectors[4].points[2].portal = {sector:3, line:0};
+sectors[5].points[0].portal = {sector:6, line:0};
+sectors[5].points[4].portal = {sector:4, line:0};
+sectors[6].points[0].portal = {sector:5, line:0};
+sectors[6].points[2].portal = {sector:0, line:5};
 
 function completeSectors() {
     for (var sectorId = 0; sectorId < sectors.length; sectorId++) {
@@ -144,6 +158,9 @@ function drawSector3d(sectorId, previousSectorId, renderState, clipMin, clipMax)
 
         if (vecs[0].x < clipMin && vecs[1].x < clipMin) continue;
         if (vecs[0].x > clipMax && vecs[1].x > clipMax) continue;
+
+        if (vecs[0].x > vecs[1].x)
+            continue;
 
         if (portal) {
             if (portal.sector != previousSectorId) {
