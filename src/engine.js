@@ -210,8 +210,13 @@ function drawSector3d(sectorId, previousSectorId, renderState, clipMin, clipMax)
                 ctx.beginPath();
                 ctx.moveTo(vecs[0].x, vecs[0].y);
                 ctx.lineTo(vecs[1].x, vecs[1].y);
-                ctx.lineTo(vecs[5].x, vecs[5].y);
-                ctx.lineTo(vecs[4].x, vecs[4].y);
+                if (otherSector.bottom > sector.top) {
+                    ctx.lineTo(vecs[2].x, vecs[2].y);
+                    ctx.lineTo(vecs[3].x, vecs[3].y);
+                } else {
+                    ctx.lineTo(vecs[5].x, vecs[5].y);
+                    ctx.lineTo(vecs[4].x, vecs[4].y);
+                }
                 ctx.closePath();
                 ctx.fill();
                 ctx.stroke();
@@ -228,8 +233,13 @@ function drawSector3d(sectorId, previousSectorId, renderState, clipMin, clipMax)
                 ctx.beginPath();
                 ctx.moveTo(vecs[2].x, vecs[2].y);
                 ctx.lineTo(vecs[3].x, vecs[3].y);
-                ctx.lineTo(vecs[7].x, vecs[7].y);
-                ctx.lineTo(vecs[6].x, vecs[6].y);
+                if (otherSector.top < sector.bottom) {
+                    ctx.lineTo(vecs[0].x, vecs[0].y);
+                    ctx.lineTo(vecs[1].x, vecs[1].y);
+                } else {
+                    ctx.lineTo(vecs[7].x, vecs[7].y);
+                    ctx.lineTo(vecs[6].x, vecs[6].y);
+                }
                 ctx.closePath();
                 ctx.fill();
                 ctx.stroke();
