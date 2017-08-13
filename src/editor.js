@@ -192,15 +192,6 @@ function toggleViewMode(point) {
     else { view3d = false; }
 }
 
-function loadMap() {
-    var name = prompt("Load map ...");
-    sectors = JSON.parse(localStorage["map_" + name]);
-}
-
-function saveMap() {
-    var name = prompt("Save map as ...");
-    localStorage["map_" + name] = JSON.stringify(sectors);
-}
 
 document.addEventListener('keydown', function(event) {
     if (!view3d) {

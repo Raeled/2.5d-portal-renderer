@@ -32,5 +32,12 @@ function mainLoop() {
         drawMap({context: ctx2, viewMatrix: viewMatrix, fillSectors: false});
 }
 
+document.addEventListener('keydown', function(event) {
+    switch (event.keyCode) {
+        case 83 /* s */: saveMap(); break;
+        case 76 /* l */: loadMap(); break;
+    }
+});
+
 completeSectors();
 window.setInterval(mainLoop, 1000/30);

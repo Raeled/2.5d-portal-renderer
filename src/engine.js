@@ -289,6 +289,16 @@ function drawMap(renderState) {
     ctx.stroke();
 }
 
+function loadMap() {
+    var name = prompt("Load map ...");
+    sectors = JSON.parse(localStorage["map_" + name]);
+}
+
+function saveMap() {
+    var name = prompt("Save map as ...");
+    localStorage["map_" + name] = JSON.stringify(sectors);
+}
+
 function keyChanged(event, pressed) {
     if (event.keyCode == 37) { keyLeft = pressed; }
     if (event.keyCode == 38) { keyUp = pressed; }
