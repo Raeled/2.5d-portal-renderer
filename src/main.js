@@ -16,14 +16,14 @@ function mainLoop() {
     if (minimapMode == 2)
         ctx2.clearRect(0, 0, ctx2.canvas.width, ctx2.canvas.height);
 
-    var nearClip = 5.0;
+    var nearClip = 1;
     var ratio = ctx2.canvas.width / ctx2.canvas.height;
 
     var renderState = {
         context: ctx2,
         viewMatrix: viewMatrix,
         nearClip: nearClip,
-        projection: mat4Projection(rads(15), ratio, nearClip, 500.0),
+        projection: mat4Projection(rads(70), ratio, nearClip, 500.0),
     };
 
     if (minimapMode == 0 || minimapMode == 1)
