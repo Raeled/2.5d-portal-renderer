@@ -1,9 +1,6 @@
 var canvas = document.getElementById("canvas");
 var ctx = canvas.getContext("2d");
 
-var canvas2 = document.getElementById("canvas2");
-var ctx2 = canvas2.getContext("2d");
-
 var minimapMode = 0;
 
 function mainLoop() {
@@ -14,23 +11,23 @@ function mainLoop() {
                                  mat4Translation({x: -player.x, y: -player.y, z: 0}));
 
     if (minimapMode == 2)
-        ctx2.clearRect(0, 0, ctx2.canvas.width, ctx2.canvas.height);
+        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
     var nearClip = 1;
-    var ratio = ctx2.canvas.width / ctx2.canvas.height;
+    var ratio = ctx.canvas.width / ctx.canvas.height;
 
     var renderState = {
-        context: ctx2,
+        context: ctx,
         viewMatrix: viewMatrix,
         nearClip: nearClip,
         projection: mat4Projection(rads(70), ratio, nearClip, 500.0),
     };
 
     if (minimapMode == 0 || minimapMode == 1)
-        drawSector3d(player.sector, -1, renderState, 0, ctx2.canvas.width);
+        drawSector3d(player.sector, -1, renderState, 0, ctx.canvas.width);
 
     if (minimapMode == 1 || minimapMode == 2)
-        drawMap({context: ctx2, viewMatrix: viewMatrix, fillSectors: minimapMode == 2});
+        drawMap({context: ctx, viewMatrix: viewMatrix, fillSectors: minimapMode == 2});
 }
 
 document.addEventListener('keydown', function(event) {
