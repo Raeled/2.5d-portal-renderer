@@ -1,4 +1,4 @@
-var keyLeft = false; var keyRight = false; var keyUp = false; var keyDown = false; var shiftPressed = false; var mapShown = false;
+var keyLeft = false; var keyRight = false; var keyUp = false; var keyDown = false; var shiftPressed = false;
 var player = {x: 0, y: 0, z: -20, angle: 0, sector: 0};
 var sectors = [
     {bottom: -40, top: 80, floorColor: "#0f0", ceilingColor: "#0ff", points: [{x:-100, y: -100}, {x:   0, y: -140}, {x: 100, y: -100}, {x: 100, y:    0}, {x: 100, y: 100}, {x:-100, y:100}]},
@@ -140,7 +140,6 @@ function activateSector(sectorId) {
 
 function drawSector3d(sectorId, previousSectorId, renderState, clipMin, clipMax) {
     var ctx = renderState.context;
-    //var ctx2 = renderState.context;
     var viewMatrix = renderState.viewMatrix;
     var nearClip = renderState.nearClip;
     var projection = renderState.projection;
@@ -360,7 +359,6 @@ function keyChanged(event, pressed) {
     if (event.keyCode == 39) { keyRight = pressed; }
     if (event.keyCode == 40) { keyDown = pressed; }
     if (event.keyCode == 16) { shiftDown = pressed; }
-    if (event.keyCode == 77) { mapShown = pressed; }
 }
 document.addEventListener('keydown', function(event) { keyChanged(event, true); });
 document.addEventListener('keyup', function(event) { keyChanged(event, false); });
