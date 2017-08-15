@@ -80,6 +80,11 @@ function updatePlayer() {
     if (keyLeft) player.angle -= 5;
     if (keyRight) player.angle += 5;
 
+    var heightDiff = player.z - (sectors[player.sector].bottom + 20);
+
+    if (heightDiff > 0)
+        player.z -= Math.min(10, heightDiff);
+
     if (moved) {
         var curSector = sectors[player.sector];
 
@@ -90,8 +95,22 @@ function updatePlayer() {
             if (linesIntersect(playerOldPos, player, p2, p3)) {
                 var linePortal = curSector.points[line].portal;
                 if (linePortal) {
-                    player.sector = linePortal.sector;
-                    player.z = sectors[player.sector].bottom + 20;
+                    var newSector = sectors[linePortal.sector];
+
+                    var lowest = newSector.bottom + 20 - 10;
+                    var highest = newSector.top - 10;
+
+                    var canCross = lowest <= player.z && highest >= player.z;
+
+                    if (canCross) {
+                        player.sector = linePortal.sector;
+
+                        if (player.z < sectors[player.sector].bottom + 20)
+                            player.z = sectors[player.sector].bottom + 20;
+                    } else {
+                        player.x = playerOldPos.x;
+                        player.y = playerOldPos.y;
+                    }
                 } else {
                     player.x = playerOldPos.x;
                     player.y = playerOldPos.y;
