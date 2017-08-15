@@ -7,7 +7,9 @@ var sectors = [
     {bottom: -10, top: 80, floorColor: "#f00", ceilingColor: "#0ff", points: [{x:   0, y: -240}, {x: 100, y: -240}, {x: 100, y: -220}, {x:   0, y: -220}]},
     {bottom:   0, top: 80, floorColor: "#f00", ceilingColor: "#0ff", points: [{x:   0, y: -260}, {x: 100, y: -260}, {x: 100, y: -240}, {x:   0, y: -240}]},
     {bottom:  10, top: 80, floorColor: "#00f", ceilingColor: "#0ff", points: [{x:-100, y: -260}, {x:-200, y: -260}, {x:-200, y: -360}, {x: 100, y: -360}, {x: 100, y: -260}, {x:   0, y: -260}]},
-    {bottom:  10, top: 80, floorColor: "#00f", ceilingColor: "#0ff", points: [{x:-200, y: -260}, {x:-100, y: -260}, {x:-100, y: -100}, {x:-100, y:  100}, {x:-200, y:  100}]}
+    {bottom:  10, top: 80, floorColor: "#00f", ceilingColor: "#0ff", points: [{x:-200, y: -260}, {x:-100, y: -260}, {x:-100, y: -100}, {x:-100, y:  100}, {x:-200, y:  100}]},
+    {bottom: -40, top: 20, floorColor: "#f00", ceilingColor: "#f00", points: [{x: 100, y:  100}, {x: 100, y:    0}, {x: 200, y:    0}, {x: 200, y:  100}]},
+    {bottom: -200, top: -80, floorColor: "#0f0", ceilingColor: "#000", points: [{x: 200, y:  100}, {x: 200, y:    0}, {x: 500, y:    0}, {x: 500, y:  100}]}
 ];
 sectors[0].points[1].portal = {sector:1, line:2};
 sectors[0].points[5].portal = {sector:6, line:2};
@@ -23,6 +25,12 @@ sectors[5].points[0].portal = {sector:6, line:0};
 sectors[5].points[4].portal = {sector:4, line:0};
 sectors[6].points[0].portal = {sector:5, line:0};
 sectors[6].points[2].portal = {sector:0, line:5};
+sectors[0].points[3].portal = {sector:7, line:0};
+sectors[7].points[0].portal = {sector:0, line:3};
+sectors[7].points[2].portal = {sector:8, line:0};
+sectors[8].points[0].portal = {sector:7, line:2};
+
+sectors[7].effect = 2;
 
 function completeSectors() {
     for (var sectorId = 0; sectorId < sectors.length; sectorId++) {
@@ -87,6 +95,43 @@ function updatePlayer() {
                 } else {
                     player.x = playerOldPos.x;
                     player.y = playerOldPos.y;
+                }
+            }
+        }
+    }
+}
+
+function updateSectors() {
+    for (var sectorId = 0; sectorId < sectors.length; sectorId++) {
+        var sector = sectors[sectorId];
+        if (sector.active) {
+
+            if (sector.effect == 1 || sector.effect == 2) {
+                if (sector.target > sector.bottom) { sector.bottom += 1; if (sector.effect == 2) sector.top += 1; }
+                else if (sector.target < sector.bottom) { sector.bottom -= 1; if (sector.effect == 2) sector.top -= 1; }
+                else { sector.active = false; }
+
+                if (player.sector == sectorId) {
+                    player.z = sector.bottom + 20;
+                }
+            }
+        }
+    }
+}
+
+function activateSector(sectorId) {
+    var sector = sectors[sectorId];
+
+    if (sector.effect == 1 || sector.effect == 2) {
+        for (line = 0; line < sector.points.length; line++) {
+            var a = sector.points[line];
+
+            if (a.portal) {
+                var otherSector = sectors[a.portal.sector];
+                if (otherSector.bottom != sector.bottom) {
+                    sector.target = otherSector.bottom;
+                    sector.active = true;
+                    break;
                 }
             }
         }
