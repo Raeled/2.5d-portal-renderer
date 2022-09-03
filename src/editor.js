@@ -260,14 +260,14 @@ function mainLoop() {
         var viewMatrix = mat4MulMat4(mat4Rotation(rads(-player.angle)),
                                      mat4Translation({x: -player.x, y: -player.y, z: 0}));
 
-        var nearClip = 5.0;
+        var nearClip = 1.0;
         var ratio = ctx.canvas.width / ctx.canvas.height;
 
         var renderState = {
             context: ctx,
             viewMatrix: viewMatrix,
             nearClip: nearClip,
-            projection: mat4Projection(rads(15), ratio, nearClip, 500.0),
+            projection: mat4Projection(rads(70), ratio, nearClip, 500.0),
         };
 
         drawSector3d(player.sector, -1, renderState, 0, ctx.canvas.width);

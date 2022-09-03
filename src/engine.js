@@ -222,8 +222,7 @@ function drawSector3d(sectorId, previousSectorId, renderState, clipMin, clipMax)
         if (vecs[0].x < clipMin && vecs[1].x < clipMin) continue;
         if (vecs[0].x > clipMax && vecs[1].x > clipMax) continue;
 
-        if (vecs[0].x > vecs[1].x)
-            continue;
+        if (vecs[0].x > vecs[1].x) continue;
 
         if (portal) {
             if (portal.sector != previousSectorId) {
